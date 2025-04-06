@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import User from "../models/user.model.js";
 import cookieParser from "cookie-parser";
 
 // This middleware checks if the user is authenticated by verifying the JWT token
@@ -12,11 +12,13 @@ export const protectRoute = async (req, res, next) => {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+        console.log("Decoded token:", decoded); // Log the decoded token for debugging
+
         if (!decoded) {
             return res.status(401).json({ message: "Unauthorized - Invalid token" });
         }
 
-        const user = await User.findById(decoded.userId).select("-password");
+        const user = await User.findById(decoded.id).select("-password");
 
         if (!user) {
             return res.status(401).json({ message: "Unauthorized - User not found" });
