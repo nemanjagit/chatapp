@@ -1,35 +1,57 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [todoList, setTodoList] = useState([]);
+  const [newTaskName, setNewTask] = useState("");
+
+  const handleInputChange = (event) => {
+    setNewTask(event.target.value);
+  }
+
+  const addTask = () => {
+    if (newTaskName.trim() === "") {
+      alert("Please enter a task name.");
+      return;
+    }
+    const task = {
+      id: todoList.length === 0 ? 0 : todoList[todoList.length - 1].id + 1,
+      taskName: newTaskName,
+      completed: false
+    }
+    setTodoList([...todoList, task]);
+    setNewTask("");
+    inputField.current.value = "";
+  }
+
+  const deleteTask = (idToRemove) => {
+    setTodoList(todoList.filter((task) => task.id !== idToRemove));
+    setNewTask("");
+  }
+
+  const turnGreen = (idToTurnGreen) => {
+    const task = todoList.find((task) => task.id === idToTurnGreen);
+    if (task) {
+      task.completed = !task.completed;
+      setTodoList([...todoList]);
+    }
+  }
+
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div>
+      <input type="text" placeholder='task to add' className='inputField' onChange={handleInputChange} value={newTaskName}></input>
+      <button onClick={addTask}>Add</button>
+      <list className='todoList'>
+        {todoList.map((task) => {
+          return <>
+            <li className='todoItem'style={{color: task.completed ? 'green' : 'white' }}>{task.taskName}</li>
+            <button className='completeButton' onClick={() => turnGreen(task.id)}>Complete</button>
+            <button className='deleteButton' onClick={() => deleteTask(task.id)}>Delete</button>
+          </>;
+        })}
+      </list>
+    </div>
   )
 }
-
-export default App
+export default App;
