@@ -1,57 +1,44 @@
-import { useState } from 'react';
-import './App.css';
+import React, { useEffect } from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import HomePage from './pages/HomePage'
+import SignupPage from './pages/SignupPage'
+import LoginPage from './pages/LoginPage'
+import ProfilePage from './pages/ProfilePage'
+import SettingsPage from './pages/SettingsPage'
+import Navbar from './components/Navbar'
+import { useAuthStore } from './store/useAuthStore'
+import {Loader} from 'lucide-react'
+import { Toaster } from 'react-hot-toast'
 
-function App() {
-  const [todoList, setTodoList] = useState([]);
-  const [newTaskName, setNewTask] = useState("");
+const App = () => {
+  const {authUser, checkAuth, isCheckingAuth} = useAuthStore();
 
-  const handleInputChange = (event) => {
-    setNewTask(event.target.value);
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+  console.log(authUser);
+
+  if(isCheckingAuth && !authUser) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader className="size-10 animate-spin"/>
+      </div>
+    )
   }
-
-  const addTask = () => {
-    if (newTaskName.trim() === "") {
-      alert("Please enter a task name.");
-      return;
-    }
-    const task = {
-      id: todoList.length === 0 ? 0 : todoList[todoList.length - 1].id + 1,
-      taskName: newTaskName,
-      completed: false
-    }
-    setTodoList([...todoList, task]);
-    setNewTask("");
-    inputField.current.value = "";
-  }
-
-  const deleteTask = (idToRemove) => {
-    setTodoList(todoList.filter((task) => task.id !== idToRemove));
-    setNewTask("");
-  }
-
-  const turnGreen = (idToTurnGreen) => {
-    const task = todoList.find((task) => task.id === idToTurnGreen);
-    if (task) {
-      task.completed = !task.completed;
-      setTodoList([...todoList]);
-    }
-  }
-
 
   return (
     <div>
-      <input type="text" placeholder='task to add' className='inputField' onChange={handleInputChange} value={newTaskName}></input>
-      <button onClick={addTask}>Add</button>
-      <list className='todoList'>
-        {todoList.map((task) => {
-          return <>
-            <li className='todoItem'style={{color: task.completed ? 'green' : 'white' }}>{task.taskName}</li>
-            <button className='completeButton' onClick={() => turnGreen(task.id)}>Complete</button>
-            <button className='deleteButton' onClick={() => deleteTask(task.id)}>Delete</button>
-          </>;
-        })}
-      </list>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={authUser ? <HomePage /> : <Navigate to = "/login"/>} />
+        <Route path="/signup" element={!authUser ? <SignupPage /> : <Navigate to = "/"/>} />
+        <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to = "/"/>} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/settings" element={authUser ? <SettingsPage /> : <Navigate to = "/login"/>} />
+      </Routes>
+      <Toaster/>
     </div>
   )
 }
-export default App;
+
+export default App
