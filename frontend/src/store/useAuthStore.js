@@ -1,5 +1,4 @@
-import axios from 'axios';
-import {create} from 'zustand';
+import { create } from 'zustand';
 import { axiosInstance } from '../lib/axios';
 import { toast } from 'react-hot-toast';
 
@@ -8,8 +7,9 @@ export const useAuthStore = create((set) => ({
     isSigningUp: false,
     isLoggingIn: false,
     isUpdatingProfile: false,
-
     isCheckingAuth: true,
+
+    onlineUsers: [],
 
     checkAuth: async () => {
         try {
