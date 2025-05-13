@@ -14,7 +14,13 @@ export const useChatStore = create((set, get) => ({
         set({ isUsersLoading: true });
         try {
             const response = await axiosInstance.get("/messages/users");
-            set({ users: response.data });
+            const data = response.data;
+            if (Array.isArray(data)) {
+                set({ users: data });
+            } else {
+                console.error("Unexpected users response:", data);
+                set({ users: [] }); // fallback to empty array
+            }
         } catch (error) {
             toast.error("Failed to fetch users");
         } finally {
@@ -59,6 +65,10 @@ export const useChatStore = create((set, get) => ({
 
     unsubscribeFromMessages: () => {
         const socket = useAuthStore.getState().socket;
+        if (!socket) {
+            console.log("Socket is null during unsubscribe");
+            return;
+        }
         socket.off("newMessage");
     },
 
