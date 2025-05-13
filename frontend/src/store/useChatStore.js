@@ -9,7 +9,8 @@ export const useChatStore = create((set, get) => ({
     selectedUser: null,
     isUsersLoading: false,
     isMessagesLoading: false,
-    
+    unreadCounts: {},
+
     getUsers: async () => {
         set({ isUsersLoading: true });
         try {
@@ -51,15 +52,17 @@ export const useChatStore = create((set, get) => ({
     },
 
     subscribeToMessages: () => {
-        const {selectedUser} = get();
-        if (!selectedUser) {
-            return;
-        }
         const socket = useAuthStore.getState().socket;
+        socket.off("newMessage"); // prevent multiple handlers
         
         socket.on("newMessage", (newMessage) => {
-            if(newMessage.senderId !== selectedUser._id) return;
-            set({messages: [...get().messages, newMessage]});
+            const { selectedUser, messages, unreadCounts } = get();
+            if(selectedUser && newMessage.senderId === selectedUser._id){
+                set({messages: [...get().messages, newMessage]});
+            } else {
+                const currentCount = unreadCounts?.[newMessage.senderId] || 0;
+                set({unreadCounts: {...unreadCounts, [newMessage.senderId]: currentCount + 1}});
+            }
         });
     },
 
@@ -72,5 +75,20 @@ export const useChatStore = create((set, get) => ({
         socket.off("newMessage");
     },
 
-    setSelectedUser: (selectedUser) => set({ selectedUser }),
+    setUnreadCount: (userId, count) => {
+        set((state) => ({
+            unreadCounts: {
+                ...state.unreadCounts,
+                [userId]: count,
+            },
+        }));
+    },
+
+    setSelectedUser: (selectedUser) => {
+        const { unreadCounts } = get();
+        const newUnreadCounts = { ...unreadCounts };
+        delete newUnreadCounts[selectedUser._id];
+
+        set({ selectedUser , unreadCounts: newUnreadCounts });
+    }
 }));
