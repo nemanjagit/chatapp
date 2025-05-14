@@ -62,43 +62,44 @@ Big thanks to him for the detailed and well-explained series!
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/chat-app.git
-cd chat-app
+git clone https://github.com/nemanjagit/chatapp.git
+cd chatapp
 ```
 
-### 2. Set Up the Backend
-
-```bash
-cd server
-npm install
-```
-
-Create a `.env` file in `/server`:
+### 2. 🔒 Set Up Environment Variables
+Create a `.env` file inside the `/backend` folder:
 
 ```env
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
+MONGODB_URI=your_mongodb_connection_string
+PORT=your_server_port
 JWT_SECRET=your_jwt_secret
+
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+```
+
+### 3. Install Dependencies and Build the Frontend
+
+```bash
+npm run build # installs dependencies and builds frontend
 ```
 
 Start the backend:
 
 ```bash
+cd backend
 npm run dev
 ```
 
-### 3. Set Up the Frontend
+Open new terminal from root and start the frontend:
 
 ```bash
-cd client
-npm install
-```
-
-Start the frontend:
-
-```bash
+cd frontend
 npm run dev
 ```
+
+🧠 Note: Ensure MongoDB is running (locally or via Atlas), and that you’ve configured Cloudinary credentials correctly before starting the app.
 
 ---
 
@@ -106,13 +107,13 @@ npm run dev
 
 ```
 chat-app/
-├── client/              # React frontend
+├── frontend/              # React frontend
 │   └── src/
 │       ├── components/
 │       ├── pages/
 │       ├── store/       # Zustand stores
 │       └── ...
-├── server/              # Express backend
+├── backend/              # Express backend
 │   ├── controllers/
 │   ├── models/
 │   ├── routes/
@@ -126,17 +127,5 @@ chat-app/
 - Manual testing for login, registration, and real-time messaging
 - UI tested across various screen sizes
 - Additional tests for online toggle and unread messages
-
----
-
-## 🔒 Environment Variables
-
-In `/server/.env`:
-
-```env
-PORT=5000
-MONGO_URI=your_mongodb_uri
-JWT_SECRET=your_jwt_secret
-```
 
 ---
